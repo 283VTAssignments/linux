@@ -5929,12 +5929,15 @@ void dump_vmcs(void)
  * assistance.
  */
 extern atomic_long_t total_exits;
+extern atomic64_t total_cycles; 
 static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 {
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	u32 exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
-
+	int res = 0;
+	u64 s_time, e_time;
+	
 	/*
 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
 	 * updated. Another good is, in kvm_vm_ioctl_get_dirty_log, before
@@ -6067,7 +6070,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	if (!kvm_vmx_exit_handlers[exit_reason])
 		goto unexpected_vmexit;
 
-	return kvm_vmx_exit_handlers[exit_reason](vcpu);
+	 s_time = rdtsc();
+        res = kvm_vmx_exit_handlers[exit_reason](vcpu);
+        e_time = rdtsc();
+	atomic64_add(e_time-s_time, &total_cycles);
+        return res;
 
 unexpected_vmexit:
 	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n", exit_reason);
