@@ -14,7 +14,7 @@
 #include <linux/vmalloc.h>
 #include <linux/uaccess.h>
 #include <linux/sched/stat.h>
-
+#include <asm/atomic.h>
 #include <asm/processor.h>
 #include <asm/user.h>
 #include <asm/fpu/xstate.h>
@@ -1099,6 +1099,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 }
 EXPORT_SYMBOL_GPL(kvm_cpuid);
 
+atomic_long_t total_exits=ATOMIC_INIT(0);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
@@ -1108,11 +1109,29 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
+	
+	if( eax == 0x4FFFFFFF){
+		eax = atomic_long_read(&total_exits);
+		edx = 0;
+
+	kvm_rax_write(vcpu, eax);	
+	kvm_rbx_write(vcpu, ebx);
+	kvm_rcx_write(vcpu, ecx);
+	kvm_rdx_write(vcpu, edx);
+	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+	
+	}
+	else
+        {	
+      
 	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);
 	kvm_rdx_write(vcpu, edx);
+	}
+	
 	return kvm_skip_emulated_instruction(vcpu);
 }
+EXPORT_SYMBOL(total_exits);
 EXPORT_SYMBOL_GPL(kvm_emulate_cpuid);
