@@ -28,7 +28,7 @@
 #include <linux/tboot.h>
 #include <linux/trace_events.h>
 #include <linux/entry-kvm.h>
-
+#include <asm/atomic.h>
 #include <asm/apic.h>
 #include <asm/asm.h>
 #include <asm/cpu.h>
@@ -5928,6 +5928,7 @@ void dump_vmcs(void)
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
  */
+extern atomic_long_t total_exits;
 static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 {
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
@@ -5941,6 +5942,7 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	 * mode as if vcpus is in root mode, the PML buffer must has been
 	 * flushed already.
 	 */
+	atomic_long_inc(&total_exits);
 	if (enable_pml)
 		vmx_flush_pml_buffer(vcpu);
 
