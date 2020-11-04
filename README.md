@@ -19,7 +19,7 @@
     - Included the code for calculating the total exits in files cpuid.c and vmx.c and stored it in eax register . 
     - Tested the code changes from inner vm.
     
-    Testfile (testfile.c) added under root linux folder.
+### Testfile (testfile.c) added under root linux folder.
 
 ## Q2.
 
@@ -29,13 +29,13 @@
 3. Forked the linux repo from https://github.com/torvalds/linux.
 4. Cloned the forked repo in the VM.
 5. Navigate to the cloned linux folder and run the below commands:
- - sudo bash
- - apt-get install build-essential kernel-package fakeroot libncurses5-dev libssl-dev ccache bison flex libelf-dev
- - uname -a 
- - cp /boot/config-4.15.0-112-generic ./.config (replace with our kernel version)
- - make oldconfig (accept all default values)
- - make && make modules && make install && make modules_install 
- - reboot
+  - sudo bash
+  - apt-get install build-essential kernel-package fakeroot libncurses5-dev libssl-dev ccache bison flex libelf-dev
+  - uname -a 
+  - cp /boot/config-4.15.0-112-generic ./.config (replace with our kernel version)
+  - make oldconfig (accept all default values)
+  - make && make modules && make install && make modules_install 
+  - reboot
 6. Verify that you are using the newer kernel after reboot:
  - uname -a
 7. Added the code changes in arch/x86/kvm/cpuid.c and arch/x86/kvm/vmx/vmx.c files.
