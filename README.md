@@ -19,6 +19,7 @@
     - Included the code for calculating the total exits in files cpuid.c and vmx.c and stored it in eax register . 
     - Tested the code changes from inner vm.
     
+### Output file(Output.pdf) added under root linux folder.    
 ### Testfile (testfile.c) added under root linux folder.
 
 ## Q2.
